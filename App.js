@@ -27,6 +27,7 @@ const EventsStack = () => {
       <Stack.Screen name="Community Events" component={CommunityEventsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Event Details" component={EventDetailsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Feedback" component={ResFeedbackScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Community Register" component={CommunityRegisterScreen} options={{ headerShown: false }} />
    
     </Stack.Navigator>
   );
@@ -37,7 +38,6 @@ const ManagerStack = () => {
     <Stack.Navigator>
       <Stack.Screen name="Manager Home" component={CommunityManagerHomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Manage Users" component={CommunityManageUsersScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Community Register" component={CommunityRegisterScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Event Request" component={CommunityEventRequestScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Community Profile" component={CommunityProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Add Users" component={CommunityAddUserScreen} options={{ headerShown: false }} />
