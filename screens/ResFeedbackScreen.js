@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native'
-import { TextInput, Button } from 'react-native-paper';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
+import { TextInput, Button, } from 'react-native-paper';
 import React, {useState, useEffect} from 'react'
 import DropDownPicker from 'react-native-dropdown-picker';
 import { collection, addDoc, getDocs } from "firebase/firestore"; 
@@ -41,7 +41,7 @@ const ResFeedbackScreen = ( {route, navigation} ) => {
     }
     
       return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
                    
           {/* <DropDownPicker
                 open={open}
@@ -61,7 +61,7 @@ const ResFeedbackScreen = ( {route, navigation} ) => {
 
           <Button onPress={send}> Send </Button>
           </View>  
-        </View>
+        </SafeAreaView>
       );
 }
 
