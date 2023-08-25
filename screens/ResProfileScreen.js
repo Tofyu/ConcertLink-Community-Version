@@ -1,26 +1,25 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { Button, Input } from "@rneui/themed";
+import { TextInput, Button } from 'react-native-paper';
 import { collection, getDoc, updateDoc, doc } from "firebase/firestore";
 import { db, auth } from '../firebase';
 
-const VolProfileScreen = ({ navigation }) => {
+const ResProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState({})
   const [name, setName] = useState()
-  const [grade, setGrade] = useState()
-  const [school, setSchool] = useState()
-  const [instrument, setInstrument] = useState()
-  const [volunteerGroup, setGroup] = useState()
+  const [birthDate, setBirth] = useState()
+  const [communityName, setCommunityName] = useState()
   const [phone, setPhone] = useState()
   const [email, setEmail] = useState()
   const userid = auth.currentUser;
 
   const fetchData = async () => {
-    const docRef = doc(db, "volunteers", userid.uid);
+    const docRef = doc(db, "users", userid.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       setUser(docSnap.data());
+      setBirth(docSnap.data().birthDate.toDate().toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }))
       console.log("Document data:", docSnap.data());
     } else {
       console.log("No such document!");
@@ -33,18 +32,14 @@ const VolProfileScreen = ({ navigation }) => {
 
   const save = async () => {
     try {
-      const docRef = await updateDoc(collection(db, "volunteers", userid.uid), {
+      const docRef = await updateDoc(collection(db, "users"), {
         name: name,
-        grade: grade,
-        school: school,
-        instrument: instrument,
+        birthDate: birthDate,
         phone: phone,
         email: email
-
       });
-
-      navigation.navigate("Volunteer Events")
-
+      
+      navigation.navigate("Community Events")
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -53,67 +48,54 @@ const VolProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Volunteer Profile</Text>
+      <Text style={styles.title}>Resident Profile</Text>
 
-      <Input
+      <Text style = {styles.text}> Name </Text>
+      <TextInput
         style={styles.input}
         placeholder={user.name}
         onChangeText={setName}
         value={name}
       />
 
-      <Input
+      <Text style = {styles.text}> Community </Text>
+      <TextInput
         style={styles.input}
-        placeholder={user.grade}
-        onChangeText={setGrade}
-        value={grade}
+        placeholder={user.communityName}
+        value={communityName}
       />
 
-      <Input
+      <Text style = {styles.text}> Birthday </Text>
+      <TextInput
         style={styles.input}
-        placeholder={user.school}
-        onChangeText={setSchool}
-        value={school}
+        placeholder={birthDate}
+        onChangeText={setBirth}
+        value={birthDate}
       />
 
-      <Input
-        style={styles.input}
-        placeholder={user.instrument}
-        onChangeText={setInstrument}
-        value={instrument}
-      />
-
-      <Input
-        style={styles.input}
-        placeholder={user.volunteerGroup}
-        value={volunteerGroup}
-      />
-
-      <Input
+<Text style = {styles.text}> Phone </Text>
+      <TextInput
         style={styles.input}
         placeholder={user.phone}
         onChangeText={setPhone}
         value={phone}
       />
 
-      <Input
+<Text style = {styles.text}> Email </Text>
+      <TextInput
         style={styles.input}
         placeholder={user.email}
         onChangeText={setEmail}
         value={email}
       />
 
-      <Button
-        title="Save"
-        buttonStyle={styles.button}
-        titleStyle={styles.buttonText}
-        onPress={save}
-      />
+      <Button onPress={save}> Save </Button>
+
     </View>
   )
 }
 
-export default VolProfileScreen
+export default ResProfileScreen
 
 const styles = StyleSheet.create({
   container: {
@@ -124,6 +106,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: 2,
+    paddingTop: 15,
+    paddingBottom: 15
+  },
+  text: {
+    fontSize: 15,
     fontWeight: '700',
     letterSpacing: 2,
     paddingTop: 15,
@@ -140,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   button: {
-    backgroundColor: '#27D5F5',
+    backgroundColor: 'rgba(39, 213, 245, 0.8)',
     borderRadius: 15,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -148,7 +137,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 25,
     color: '#fff',
   },
 });
