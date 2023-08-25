@@ -1,25 +1,26 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { TextInput, Button } from 'react-native-paper';
+import { Button, Input } from "@rneui/themed";
 import { collection, getDoc, updateDoc, doc } from "firebase/firestore";
 import { db, auth } from '../firebase';
 
-const ResProfileScreen = ({ navigation }) => {
+const VolProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState({})
   const [name, setName] = useState()
-  const [birthDate, setBirth] = useState()
-  const [communityName, setCommunityName] = useState()
+  const [grade, setGrade] = useState()
+  const [school, setSchool] = useState()
+  const [instrument, setInstrument] = useState()
+  const [volunteerGroup, setGroup] = useState()
   const [phone, setPhone] = useState()
   const [email, setEmail] = useState()
   const userid = auth.currentUser;
 
   const fetchData = async () => {
-    const docRef = doc(db, "users", userid.uid);
+    const docRef = doc(db, "volunteers", userid.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       setUser(docSnap.data());
-      setBirth(docSnap.data().birthDate.toDate().toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }))
       console.log("Document data:", docSnap.data());
     } else {
       console.log("No such document!");
@@ -32,14 +33,18 @@ const ResProfileScreen = ({ navigation }) => {
 
   const save = async () => {
     try {
-      const docRef = await updateDoc(collection(db, "users"), {
+      const docRef = await updateDoc(collection(db, "volunteers", userid.uid), {
         name: name,
-        birthDate: birthDate,
+        grade: grade,
+        school: school,
+        instrument: instrument,
         phone: phone,
         email: email
+
       });
-      
-      navigation.navigate("Community Events")
+
+      navigation.navigate("Volunteer Events")
+
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -48,49 +53,67 @@ const ResProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Resident Profile</Text>
+      <Text style={styles.title}>Volunteer Profile</Text>
 
-      <TextInput
+      <Input
         style={styles.input}
         placeholder={user.name}
         onChangeText={setName}
         value={name}
       />
 
-      <TextInput
+      <Input
         style={styles.input}
-        placeholder={user.communityName}
-        value={communityName}
+        placeholder={user.grade}
+        onChangeText={setGrade}
+        value={grade}
       />
 
-      <TextInput
+      <Input
         style={styles.input}
-        placeholder={birthDate}
-        onChangeText={setBirth}
-        value={birthDate}
+        placeholder={user.school}
+        onChangeText={setSchool}
+        value={school}
       />
 
-      <TextInput
+      <Input
+        style={styles.input}
+        placeholder={user.instrument}
+        onChangeText={setInstrument}
+        value={instrument}
+      />
+
+      <Input
+        style={styles.input}
+        placeholder={user.volunteerGroup}
+        value={volunteerGroup}
+      />
+
+      <Input
         style={styles.input}
         placeholder={user.phone}
         onChangeText={setPhone}
         value={phone}
       />
 
-      <TextInput
+      <Input
         style={styles.input}
         placeholder={user.email}
         onChangeText={setEmail}
         value={email}
       />
 
-      <Button onPress={save}> Save </Button>
-
+      <Button
+        title="Save"
+        buttonStyle={styles.button}
+        titleStyle={styles.buttonText}
+        onPress={save}
+      />
     </View>
   )
 }
 
-export default ResProfileScreen
+export default VolProfileScreen
 
 const styles = StyleSheet.create({
   container: {
@@ -117,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   button: {
-    backgroundColor: 'rgba(39, 213, 245, 0.8)',
+    backgroundColor: '#27D5F5',
     borderRadius: 15,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -125,7 +148,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 18,
     color: '#fff',
   },
 });
