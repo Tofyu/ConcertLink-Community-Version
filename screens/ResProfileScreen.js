@@ -11,9 +11,10 @@ const ResProfileScreen = ({ navigation }) => {
   const [communityName, setCommunityName] = useState()
   const [phone, setPhone] = useState()
   const [email, setEmail] = useState()
+  const userid = auth.currentUser;
 
   const fetchData = async () => {
-    const docRef = doc(db, "users", "iT6vZgRsAbS3VjuBUZNZ");
+    const docRef = doc(db, "users", userid.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
