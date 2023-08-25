@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { TextInput, Button } from 'react-native-paper';
 import { collection, getDoc, updateDoc, doc } from "firebase/firestore";
@@ -47,7 +47,7 @@ const ResProfileScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Resident Profile</Text>
 
       <Text style = {styles.text}> Name </Text>
@@ -91,7 +91,7 @@ const ResProfileScreen = ({ navigation }) => {
 
       <Button onPress={save}> Save </Button>
 
-    </View>
+    </SafeAreaView>
   )
 }
 
