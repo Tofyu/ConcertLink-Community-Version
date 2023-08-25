@@ -5,17 +5,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import CommunityLogInScreen from './screens/CommunityLogInScreen';
 import ResRegisterScreen from './screens/ResRegisterScreen';
 import ResProfileScreen from './screens/ResProfileScreen';
 import CommunityAddUserScreen from './screens/CommunityAddUserScreen';
 import CommunityRegisterScreen from './screens/CommunityRegisterScreen';
 import CommunityProfileScreen from './screens/CommunityProfileScreen';
+import EventDetailsScreen from './screens/EventDetailsScreen';
 import CommunityEventRequestScreen from './screens/CommunityEventRequestScreen' 
 import CommunityManageUsersScreen from './screens/CommunityManageUsersScreen'
 import CommunityManagerHomeScreen from './screens/CommunityManagerHomeScreen'    
 import CommunityEventsScreen from './screens/CommunityEventsScreen'
 import ResFeedbackScreen from './screens/ResFeedbackScreen';
+import LoginScreen from './screens/LoginScreen'
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,6 +25,7 @@ const EventsStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Community Events" component={CommunityEventsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Event Details" component={EventDetailsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Feedback" component={ResFeedbackScreen} options={{ headerShown: false }} />
    
     </Stack.Navigator>
@@ -81,9 +83,10 @@ const BottomTab = () =>{
 
 const App = () => {
   return (
+
     <NavigationContainer>
     <Stack.Navigator>
-    <Stack.Screen name="Login" component={CommunityLogInScreen} options={{headerShown:false}}/>
+    <Stack.Screen name="Login" component={LoginScreen} options={{headerShown:false}}/>
     <Stack.Screen name="Register" component={ResRegisterScreen} options={{ headerShown: false }}/>
     <Stack.Screen name="User BottomTab" component={BottomTab} options={{headerShown:false}}/>
   </Stack.Navigator>
