@@ -53,9 +53,8 @@ const ResProfileScreen = ({ navigation }) => {
       <Text style = {styles.text}> Name </Text>
       <TextInput
         style={styles.input}
-        placeholder={user.name}
         onChangeText={setName}
-        value={name}
+        value={user.name? user.name:"Enter name"}
       />
 
       <Text style = {styles.text}> Community </Text>
@@ -68,26 +67,22 @@ const ResProfileScreen = ({ navigation }) => {
       <Text style = {styles.text}> Birthday </Text>
       <TextInput
         style={styles.input}
-        placeholder={birthDate}
         onChangeText={setBirth}
-        value={birthDate}
+        value={user.birthDate? user.birthDate:"Enter birth date"}
       />
 
 <Text style = {styles.text}> Phone </Text>
       <TextInput
         style={styles.input}
-        placeholder={user.phone}
         onChangeText={setPhone}
-        value={phone}
+        value={user.phone? user.phone:"Enter phone"}
       />
 
 <Text style = {styles.text}> Email </Text>
       <TextInput
         style={styles.input}
-        placeholder={user.email}
         onChangeText={setEmail}
-        value={email}
-      />
+        value={user.email? user.email:"Enter email"}/>
 
       <Button onPress={save}> Save </Button>
 
