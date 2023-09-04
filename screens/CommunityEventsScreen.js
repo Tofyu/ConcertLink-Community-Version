@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, StyleSheet, View, FlatList } from 'react-native';
+import { Text, StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
 import { collection, getDocs, getDoc, doc, query, where } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Avatar, Card, IconButton, Button } from 'react-native-paper';
@@ -7,6 +7,7 @@ import { Avatar, Card, IconButton, Button } from 'react-native-paper';
 const CommunityEventsScreen = ({ navigation }) => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
+  const [communityUser, setCommunityUser] = useState()
   const user = auth.currentUser;
 
   const getCommunityGroupID = async () => {
@@ -16,6 +17,7 @@ const CommunityEventsScreen = ({ navigation }) => {
 
     if (docSnap.exists()) {
       groupID = docSnap.data().communityID;
+      setCommunityUser(docSnap.data().name)
     } else {
       console.log('No such document!');
     }
@@ -105,9 +107,13 @@ const CommunityEventsScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Welcome Text */}
-      <Text style={styles.welcomeText}>Welcome, {user.displayName}!</Text>
+      <Text style={styles.welcomeText}>Welcome, {communityUser}!</Text>
+      
+      <Button onPress={() => navigation.navigate('Community Register')}>
+          Register Your Community
+        </Button>
       
       {/* Upcoming Events */}
       <FlatList
@@ -126,7 +132,7 @@ const CommunityEventsScreen = ({ navigation }) => {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={<Button>Past Events</Button>}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
