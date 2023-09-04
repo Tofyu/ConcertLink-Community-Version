@@ -1,0 +1,111 @@
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
+import React, {useState, useEffect} from 'react'
+import { TextInput, Button } from 'react-native-paper';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import {db, auth} from '../firebase'
+import { addDoc, collection, setDoc, doc,getDocs } from "firebase/firestore"; 
+import { Picker } from '@react-native-picker/picker'; // Import Picker from the new package
+
+
+
+const CommunitySignUpScreen = () => {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [name, setName] = useState("")
+    const [phone, setPhone] = useState("")
+    const [birthDate, setBirthDate] = useState("")
+    const [communities, setCommunities] = useState([])
+    const [selectedCommunity, setSelectedCommunity] = useState()
+  
+    //Create an account
+    const signUpUser = async() => { 
+      createUserWithEmailAndPassword(auth, email, password)
+      .then( (userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          addUser(user.uid)
+          console.log("User created", user)
+          // ...
+      })
+      .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ..
+      });
+    }
+
+    useEffect(() => {
+        const fetchCommunities = async () => {
+          console.log("Fetch data")
+          const querySnapshot = await getDocs(collection(db, "communities"));
+          const communityList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          console.log("List", communityList)
+          setCommunities(communityList);
+        };
+    
+        fetchCommunities();
+      }, []);
+
+    useEffect(()=>{
+        console.log("Community list", communities)
+    },[communities])
+    
+    
+    //Add an user in users collection
+    const addUser = async (id) => { 
+      try {
+        const userDocRef = doc(db, "users", id);
+    
+        await setDoc(userDocRef, {
+          name:name,
+          phone:phone,
+          birthDate:birthDate,
+          email:email,
+          communityID: selectedCommunity.id,
+          communityName: selectedCommunity.name
+        });
+    
+        console.log("Document written with ID: ", id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    }
+
+    return (
+        <SafeAreaView>
+            <View style={{margin:10, justifyContent: 'space-around' }}>
+            <Text variant="titleLarge">Sign Up</Text> 
+            <View style={{marginVertical:40, justifyContent:'space-around'}}>
+                <TextInput label="Email" value={email} mode ="outlined" onChangeText={text => setEmail(text) } style={{ marginBottom: 10 }} />
+                <TextInput label="Password" value={password} onChangeText={text => setPassword(text)} secureTextEntry={true} mode ="outlined" style={{ marginBottom: 10 }} />
+                <TextInput label="Name" value={name} onChangeText={text => setName(text)} mode ="outlined" style={{ marginBottom: 10 }} />
+                <TextInput label="Phone" value={phone} mode ="outlined" onChangeText={text => setPhone(text) } style={{ marginBottom: 10 }} />
+                <TextInput label="Day of birth(mm/dd/yyyy)" value={birthDate} onChangeText={text => setBirthDate(text)} mode ="outlined" style={{ marginBottom: 10 }} />
+            </View>
+            <Text>Select Community</Text>
+            <Picker
+                selectedValue={selectedCommunity ? selectedCommunity.id : ''}
+                onValueChange={(itemValue, itemIndex) => {
+                    const selectedCommunityObject = communities.find((community) => community.id === itemValue);
+                    setSelectedCommunity(selectedCommunityObject);
+                }}
+                >
+                <Picker.Item label="Select a community" value="" />
+                {communities.map((community) => (
+                <Picker.Item key={community.id} label={community.name} value={community.id} />
+                ))}
+            </Picker>
+            <Button icon="camera" mode="elevated" onPress={signUpUser}>
+                Sign Up
+            </Button>
+          </View>
+        </SafeAreaView>
+      )
+}
+
+export default CommunitySignUpScreen
+
+const styles = StyleSheet.create({})
