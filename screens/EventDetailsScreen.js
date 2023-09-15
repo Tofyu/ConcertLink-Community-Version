@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 
-const EventDetailsScreen = ({ route }) => {
+const EventDetailsScreen = ({navigation, route }) => {
   const [eventDetails, setEventDetails] = useState(null);
   const user = auth.currentUser;
   const { eventID } = route.params;
@@ -11,6 +11,10 @@ const EventDetailsScreen = ({ route }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("Events detail::::", eventDetails)
+  }, [eventDetails]);
 
   const fetchData = async () => {
     const eventRef = doc(db, 'events', eventID);
@@ -50,9 +54,11 @@ const EventDetailsScreen = ({ route }) => {
           <Text style={styles.info}>{eventDetails.communityName}</Text>
           <Text style={styles.subLabel}>Songs:</Text>
           <View style={styles.songsContainer}>
-            {eventDetails.songsData.map((song, index) => (
-              song.isSelected && <Text key={index} style={styles.songName}>{song.name}</Text>
-            ))}
+            {eventDetails.songsData.map((song, index) => 
+            <TouchableOpacity onPress={()=>navigation.navigate("Song Details",{song:song})}>
+              <Text key={index} style={styles.songName}>{song.name}, {song.composer}</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       );
@@ -62,14 +68,14 @@ const EventDetailsScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={[eventDetails]}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -86,7 +92,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   item: {
-    // backgroundColor: '#f2f2f2',
+    //backgroundColor: '#f2f2f2',
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
