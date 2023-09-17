@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { Button, Input } from "@rneui/themed";
+import { TextInput, Button } from 'react-native-paper';
 import { collection, getDoc, updateDoc, doc } from "firebase/firestore";
 import { db, auth } from '../firebase';
 
@@ -11,9 +11,10 @@ const ResProfileScreen = ({ navigation }) => {
   const [communityName, setCommunityName] = useState()
   const [phone, setPhone] = useState()
   const [email, setEmail] = useState()
+  const userid = auth.currentUser;
 
   const fetchData = async () => {
-    const docRef = doc(db, "users", "iT6vZgRsAbS3VjuBUZNZ");
+    const docRef = doc(db, "users", userid.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -49,46 +50,40 @@ const ResProfileScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Resident Profile</Text>
 
-      <Input
+      <TextInput
         style={styles.input}
-        placeholder={user.name}
         onChangeText={setName}
-        value={name}
+        value={user.name? user.name:"Name"}
       />
 
-      <Input
+      <TextInput
         style={styles.input}
         placeholder={user.communityName}
         value={communityName}
       />
 
-      <Input
+      <TextInput
         style={styles.input}
         placeholder={birthDate}
         onChangeText={setBirth}
         value={birthDate}
       />
 
-      <Input
+      <TextInput
         style={styles.input}
         placeholder={user.phone}
         onChangeText={setPhone}
         value={phone}
       />
 
-      <Input
+      <TextInput
         style={styles.input}
-        placeholder={user.email}
         onChangeText={setEmail}
-        value={email}
+        value={user.email? user.email:"Enter email"}
       />
 
-      <Button
-        title="Save"
-        buttonStyle={styles.button}
-        titleStyle={styles.buttonText}
-        onPress={save}
-      />
+      <Button onPress={save}> Save </Button>
+
     </View>
   )
 }

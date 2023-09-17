@@ -1,115 +1,150 @@
-import { StyleSheet, Button, Text, TextInput, View, FlatList, SafeAreaView} from 'react-native'
-import React, { useState, useEffect } from 'react'
-import { collection, getDocs, doc } from "firebase/firestore";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
+import { collection, getDocs, getDoc, doc, query, where } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { Text, Avatar, Card, IconButton, Button, Divider } from 'react-native-paper';
 
-const CommunityEventsScreen = ( {navigation} ) => {
-    const [events, setEvents] = useState([])
-    
-    useEffect(()=>{
-      fetchData();
-      
-    }, [])
-  
-    const Item = ({ name }) => (
-      <View style={{ padding: 20 }}>
-        <Text>{name}</Text>
-      </View>
-    );
-    
-    const SectionHeader = ({ dateTime }) => (
-      <View style={{ backgroundColor: '#f2f2f2', padding: 10 }}>
-        <Text>{dateTime}</Text>
-      </View>
-    );
+const CommunityEventsScreen = ({ navigation }) => {
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [communityUser, setCommunityUser] = useState()
+  const [communityName, setCommunityName] = useState('')
+  const user = auth.currentUser;
 
+  const getCommunityGroupID = async () => {
+    const docRef = doc(db, 'users', user.uid);
+    const docSnap = await getDoc(docRef);
+    let groupID = '';
 
-    const fetchData = async () => {
-      let eventsFromDB = [];
-      const querySnapshot = await getDocs(collection(db, 'events'));
-      const docsData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      console.log("+++++++++++++++++++++++++++++++++++", docsData);
-    
-      for (const docSnap of docsData) {
-        if (!docSnap.empty) {
-          const songsCollectionRef = collection(db, 'events', docSnap.id, 'songs');
-          const songsSnapshot = await getDocs(songsCollectionRef);
-          const songsData = songsSnapshot.docs.map((songDoc) => songDoc.data());
-    
-          eventsFromDB.push({ id: docSnap.id, ...docSnap, songsData });
-          console.log("Document:", docSnap);
-        } else {
-          console.log("No such document!");
-        }
+    if (docSnap.exists()) {
+      groupID = docSnap.data().communityID;
+      setCommunityUser(docSnap.data().name)
+      setCommunityName(docSnap.data().communityName)
+    } else {
+      console.log('No such document!');
+    }
+
+    return groupID;
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [navigation]);
+
+  const fetchData = async () => {
+    let eventsFromDB = [];
+    const groupID = await getCommunityGroupID();
+    const eventsQuery = query(collection(db, 'events'), where('communityID', '==', groupID), where('status', '==', 'accepted'));
+    const querySnapshot = await getDocs(eventsQuery);
+    const docsData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    for (const docSnap of docsData) {
+      if (docSnap.communityID === groupID) {
+        const songsCollectionRef = collection(db, 'events', docSnap.id, 'songs');
+        const songsSnapshot = await getDocs(songsCollectionRef);
+        const songsData = songsSnapshot.docs.map((songDoc) => songDoc.data());
+
+        eventsFromDB.push({ id: docSnap.id, ...docSnap, songsData });
       }
-    
-      console.log("Events:", eventsFromDB);
-        
-        console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", eventsFromDB)
+    }
 
-          // Todo: group by date
-          // const groupedData = eventsFromDB.reduce((acc, cur) => {
-          //   let options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-          //   const dateTime = cur.dateTime.toDate().toLocaleString(undefined, options); // format to date only;
-          //   const item = { id: cur.id, name: cur.volunteerGroupName, time: cur.dateTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), location: cur.communityName };
-          //   const group = acc.find(group => group.dateTime === dateTime);
-          //   if (!group) {
-          //     acc.push({ dateTime, data: [item] });
-          //   } else {
-          //     group.data.push(item);
-          //   }
-          //   return acc;
-          // }, []);
+    const sortedData = eventsFromDB.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
 
-          // Sort by date
-        const sortedData = eventsFromDB.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)); 
+    const currentDateTime = new Date();
+    const upcoming = [];
+    const past = [];
 
-        console.log('3.2************', sortedData);
-        setEvents(sortedData);
-          
-        console.log('4 useEffect end')
-      };
+    for (const event of sortedData) {
+      const eventDateTime = event.dateTime.toDate();
+
+      if (eventDateTime <= currentDateTime) {
+        past.push(event);
+      } else {
+        upcoming.push(event);
+      }
+    }
+
+    const sortedUpcoming = upcoming.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+    const sortedPast = past.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+
+    setUpcomingEvents(sortedUpcoming);
+    setPastEvents(sortedPast);
+  };
 
 
-      const renderItem = ({ item }) => (
-        
-        <View style={styles.item}>
-          <Text style={styles.label}>{item.volunteerGroupName}</Text>
-          <Text style={styles.subLabel}>Date:</Text>
-          <Text style={styles.info}>{item.dateTime.toDate().toLocaleString([], { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</Text>
-          <Text style={styles.subLabel}>Location:</Text>
-          <Text style={styles.info}>{item.communityName}</Text>
-          <Text style={styles.subLabel}>Songs:</Text>
-          <View style={styles.songsContainer}>
-        {item.songsData.map((song, index) => (
-          song.isSelected && (
-            <Text key={index} style={styles.songName}>{song.name}</Text>
-          )
-        ))}
-      </View>
-        <Button title="Send feedback" onPress={() => navigation.navigate('Resident Feedback', {
-            eventID: item.id
-          })} />
-        
-        </View>
+  const renderItem = ({ item }) => {
+    const currentDateTime = new Date();
+    const eventDateTime = item.dateTime.toDate();
+    let buttonToRender;
+
+    if (eventDateTime <= currentDateTime) {
+      buttonToRender = (
+        <Button onPress={() => navigation.navigate('Feedback', { eventID: item.id })}>
+          Send Feedback
+        </Button>
       );
-      
+    } else {
+      buttonToRender = (
+        <Button onPress={() => navigation.navigate('Event Details', { eventID: item.id })}>
+          Event Details
+        </Button>
+      );
+    }
+
     return (
-      
-      <View style={styles.container}>
-      <FlatList 
-        data={events}
-        keyExtractor={(item, index) => item.id + index}
+      <Card style={{ margin: 5 }}>
+        <Card.Title
+          title={item.volunteerGroupName}
+          subtitle={eventDateTime.toLocaleString([], {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        />
+        <Card.Actions>{buttonToRender}</Card.Actions>
+      </Card>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Welcome Text */}
+
+      <Text style={styles.welcomeText}>Welcome, {communityUser}!</Text>
+      {/* Show community name if there is, otherwise show create buttom */}
+      <View style={{ alignItems: 'flex-end', margin: 10 }}>
+        {communityName === null ? (
+          <Button icon="home-group-plus" mode="elevated" onPress={() => navigation.navigate('Community Register', { userID: user.uid })}>
+            Register Your Community
+          </Button>
+        ) : (
+          <Text variant="titleMedium" style={{color:'gold'}}>{communityName}</Text>
+        )}
+      </View>
+      <Divider />
+
+      {/* Upcoming Events */}
+      <FlatList
+        data={upcomingEvents}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
+        ListHeaderComponent={<Button>Upcoming Events</Button>}
       />
-    </View>
-      
-    )
 
-  }
-
-export default CommunityEventsScreen
+      {/* Past Events */}
+      <FlatList
+        data={pastEvents}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={<Button>Past Events</Button>}
+      />
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -118,37 +153,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
   },
+  welcomeText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginHorizontal: 10
+  },
   listContent: {
     paddingBottom: 20,
   },
-  item: {
-    backgroundColor: '#f2f2f2',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#666',
-  },
-  info: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  songsContainer: {
-    marginTop: 5,
-  },
-  songName: {
-    fontSize: 14,
-    marginBottom: 3,
-    color: '#333',
-  },
+});
 
-})
+export default CommunityEventsScreen;
