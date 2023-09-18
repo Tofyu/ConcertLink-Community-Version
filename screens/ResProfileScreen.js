@@ -31,16 +31,17 @@ const ResProfileScreen = ({ navigation }) => {
   }, [])
 
   const save = async () => {
+    const userRef = doc(db, "users", userid.uid);
+
     try {
-      const docRef = await updateDoc(collection(db, "users"), {
-        name: name,
-        birthDate: birthDate,
-        phone: phone,
-        email: email
+      const docRef = await updateDoc(userRef, {
+        name: name||"",
+        birthDate: birthDate||"",
+        phone: phone||"",
+        email: email||"",
       });
-      
+      console.log("Profile changed")
       navigation.navigate("Community Events")
-      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
