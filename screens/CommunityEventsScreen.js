@@ -28,7 +28,13 @@ const CommunityEventsScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchData();
+    // Add a navigation listener to re-fetch data when the screen is focused
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchData();
+    });
+
+    // Clean up the listener when the component unmounts
+    return unsubscribe;
   }, [navigation]);
 
   const fetchData = async () => {

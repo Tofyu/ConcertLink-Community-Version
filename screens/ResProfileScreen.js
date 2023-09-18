@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { TextInput, Button } from 'react-native-paper';
-import { collection, getDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, getDoc, updateDoc, doc, getDocs } from "firebase/firestore";
 import { db, auth } from '../firebase';
+import { Picker } from '@react-native-picker/picker'; // Import Picker from the new package
 
 const ResProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState({})
@@ -11,34 +12,56 @@ const ResProfileScreen = ({ navigation }) => {
   const [communityName, setCommunityName] = useState()
   const [phone, setPhone] = useState()
   const [email, setEmail] = useState()
+  const [communities, setCommunities] = useState([])
+  const [selectedCommunity, setSelectedCommunity] = useState()
   const userid = auth.currentUser;
 
-  const fetchData = async () => {
-    const docRef = doc(db, "users", userid.uid);
-    const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      setUser(docSnap.data());
-      setBirth(docSnap.data().birthDate.toDate().toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }))
-      console.log("Document data:", docSnap.data());
-    } else {
-      console.log("No such document!");
-    }
-  };
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    //get community list for picker
+    const fetchCommunities = async () => {
+      console.log("Fetch data")
+      const querySnapshot = await getDocs(collection(db, "communities"));
+      const communityList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log("List", communityList)
+      setCommunities(communityList);
+    };
+
+    //Read user information
+    const fetchUserData = async () => {
+      const docRef = doc(db, "users", userid.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setUser(docSnap.data());
+        setBirth(docSnap.data().birthDate.toDate().toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }))
+        console.log("Document data:", docSnap.data());
+        setSelectedCommunity[docSnap.data().communityID]
+      } else {
+        console.log("No such document!");
+      }
+    };
+
+    fetchCommunities();
+    fetchUserData();
+
+  }, []);
 
   const save = async () => {
     const userRef = doc(db, "users", userid.uid);
 
     try {
       const docRef = await updateDoc(userRef, {
-        name: name||"",
-        birthDate: birthDate||"",
-        phone: phone||"",
-        email: email||"",
+        name: name || "",
+        birthDate: birthDate || "",
+        phone: phone || "",
+        email: email || "",
+        communityID: selectedCommunity.ID || "",
+        communityName: selectedCommunity.name || ""
       });
       console.log("Profile changed")
       navigation.navigate("Community Events")
@@ -48,20 +71,16 @@ const ResProfileScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Resident Profile</Text>
 
       <TextInput
         style={styles.input}
         onChangeText={setName}
-        value={user.name? user.name:"Name"}
+        value={user.name ? user.name : "Name"}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder={user.communityName}
-        value={communityName}
-      />
+
 
       <TextInput
         style={styles.input}
@@ -80,12 +99,24 @@ const ResProfileScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         onChangeText={setEmail}
-        value={user.email? user.email:"Enter email"}
+        value={user.email ? user.email : "Enter email"}
       />
+      <Picker
+        selectedValue={selectedCommunity ? selectedCommunity.id : ''}
+        onValueChange={(itemValue, itemIndex) => {
+          const selectedCommunityObject = communities.find((community) => community.id === itemValue);
+          setSelectedCommunity(selectedCommunityObject);
+        }}
+      >
+        <Picker.Item label="Select a community" value="" />
+        {communities.map((community) => (
+          <Picker.Item key={community.id} label={community.name} value={community.id} />
+        ))}
+      </Picker>
 
       <Button onPress={save}> Save </Button>
 
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -94,9 +125,7 @@ export default ResProfileScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    margin: 20
   },
   title: {
     fontSize: 30,
