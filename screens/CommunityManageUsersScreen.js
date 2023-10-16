@@ -58,9 +58,9 @@ const CommunityManageUserScreen = ({ navigation, route,
   }, [navigation]);
 
 
-  useEffect(() => {
-    console.log("*********", users)
-  })
+  // useEffect(() => {
+  //   console.log("*********", users)
+  // })
 
   const deleteItem = async (id) => {
     try {

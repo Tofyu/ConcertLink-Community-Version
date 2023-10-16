@@ -27,7 +27,7 @@ const CommunityEventRequestScreen = ({navigation, route}) => {
             const volunteerGroupId = groupDoc.id;
             const volunteerGroupData = groupDoc.data()
             const volunteerGroupName = groupDoc.data().name;
-            console.log(volunteerGroupName)
+            // console.log(volunteerGroupName)
 
             // Assuming "availabilities" is the collection name for availabilities
             const availabilitiesSnapshot = await getDocs(collection(db, 'volunteerGroups', volunteerGroupId, "availabilities"));
@@ -40,7 +40,7 @@ const CommunityEventRequestScreen = ({navigation, route}) => {
           
 
           setAvailabilities(allAvailabilities);
-          console.log( allAvailabilities );
+          // console.log( allAvailabilities );
         } catch (error) {
           console.error('Error retrieving availabilities:', error);
         }
@@ -52,7 +52,7 @@ const CommunityEventRequestScreen = ({navigation, route}) => {
     const docRef = doc(db, 'communities', communityID);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        console.log("Community:::::::", docSnap.data())
+        // console.log("Community:::::::", docSnap.data())
         setCommunity({...docSnap.data()})
       
     } else {
@@ -78,9 +78,9 @@ const CommunityEventRequestScreen = ({navigation, route}) => {
     //     readAvailabilities()
     //   },[])
 
-      useEffect(() => {
-        console.log(community)
-      })
+      // useEffect(() => {
+      //   console.log(community)
+      // })
 
 
     const requestEvent = async(item) => { 

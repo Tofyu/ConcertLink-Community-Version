@@ -33,16 +33,16 @@ const CommunityProfileScreen = ({ navigation, route }) => {
         setZip(community.zip)
         setSize(community.size)
         setDescription(community.description)
-    console.log("Document data:", docSnap.data());
+    // console.log("Document data:", docSnap.data());
     } else {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
     }
   }, [])
 
-  useEffect(() => {
-    console.log("community: " + name + "\n")
-  })
+  // useEffect(() => {
+  //   console.log("community: " + name + "\n")
+  // })
 
 const save = async() => {
   const commRef = doc(db, "communities", groupID);

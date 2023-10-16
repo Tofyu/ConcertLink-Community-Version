@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "ConcertLink_CommunityVersion",
-    "slug": "ConcertLink_CommunityVersion",
-    "version": "1.0.0",
+    "name": "ConcertLink Community Version",
+    "slug": "ConcertLinkCommunityVersion",
+    "version": "1.0.5",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Concert_Link_Logo.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.promised23.ConcertLinkCommunityVersion"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +26,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0aa4786a-7d6d-49fc-ae1f-eba32764212a"
+      }
     }
   }
 }

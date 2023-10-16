@@ -27,6 +27,17 @@ const CommunityEventsScreen = ({ navigation }) => {
     return groupID;
   };
 
+  // Function to handle user logout
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      // You can navigate to your login or authentication screen here
+      navigation.navigate('Login'); // Adjust this line as per your navigation setup
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   useEffect(() => {
     // Add a navigation listener to re-fetch data when the screen is focused
     const unsubscribe = navigation.addListener('focus', () => {
@@ -116,9 +127,16 @@ const CommunityEventsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Welcome Text */}
-
-      <Text style={styles.welcomeText}>Welcome, {communityUser}!</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems:'flex-start' }}>
+  {/* Welcome Text */}
+  <Text style={styles.welcomeText}>Welcome, {communityUser}!</Text>
+  <IconButton
+    style={{ marginTop: -5 }}
+    icon="logout"
+    onPress={handleLogout}
+    color="silver" // Adjust the color as needed
+  />
+</View>
       {/* Show community name if there is, otherwise show create buttom */}
       <View style={{ alignItems: 'flex-end', margin: 10 }}>
         {communityName === null ? (
@@ -126,8 +144,9 @@ const CommunityEventsScreen = ({ navigation }) => {
             Register Your Community
           </Button>
         ) : (
-          <Text variant="titleMedium" style={{color:'gold'}}>{communityName}</Text>
+          <Text variant="titleMedium" style={{color:'teal'}}>{communityName}</Text>
         )}
+       
       </View>
       <Divider />
 

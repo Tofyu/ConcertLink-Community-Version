@@ -26,7 +26,7 @@ const CommunitySignUpScreen = ({ navigation }) => {
       .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
-        console.log("User created", user)
+        //console.log("User created", user)
         addUser(user.uid)
         navigation.navigate("Login")
         // ...
@@ -46,16 +46,16 @@ const CommunitySignUpScreen = ({ navigation }) => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("List", communityList)
+      //console.log("List", communityList)
       setCommunities(communityList);
     };
 
     fetchCommunities();
   }, []);
 
-  useEffect(() => {
-    console.log("Community list", communities)
-  }, [communities])
+  // useEffect(() => {
+  //   console.log("Community list", communities)
+  // }, [communities])
 
 
   //Add an user in users collection
@@ -97,8 +97,8 @@ const CommunitySignUpScreen = ({ navigation }) => {
       <View style={{ margin: 10, justifyContent: 'space-around' }}>
         <Text variant="titleLarge">Sign Up</Text>
         <View style={{ marginVertical: 40, justifyContent: 'space-around' }}>
-          <TextInput label="Email" value={email} mode="outlined" onChangeText={text => setEmail(text)} style={{ marginBottom: 10 }} />
-          <TextInput label="Password" value={password} onChangeText={text => setPassword(text)} secureTextEntry={true} mode="outlined" style={{ marginBottom: 10 }} />
+          <TextInput label="Email" value={email} mode="outlined" onChangeText={text => setEmail(text)} style={{ marginBottom: 10 }} autoCapitalize='none'/>
+          <TextInput label="Password" value={password} onChangeText={text => setPassword(text)} secureTextEntry={true} mode="outlined" style={{ marginBottom: 10 }} autoCapitalize='none'/>
           <TextInput label="Full Name" value={name} onChangeText={text => setName(text)} mode="outlined" style={{ marginBottom: 10 }} />
           <TextInput label="Phone" value={phone} mode="outlined" onChangeText={text => setPhone(text)} style={{ marginBottom: 10 }} />
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { TextInput, Button } from 'react-native-paper';
 import { collection, getDoc, updateDoc, doc, getDocs } from "firebase/firestore";
@@ -27,7 +27,7 @@ const ResProfileScreen = ({ navigation }) => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log("List", communityList)
+      // console.log("List", communityList)
       setCommunities(communityList);
     };
 
@@ -37,7 +37,11 @@ const ResProfileScreen = ({ navigation }) => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setUser(docSnap.data());
+        const user = docSnap.data()
+        setUser(user);
+        setName(user.name)
+        setEmail(user.emial || 'Enter Email')
+        setPhone(user.phone || 'Enter phone')
         setBirth(docSnap.data().birthDate.toDate().toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }))
         console.log("Document data:", docSnap.data());
         setSelectedCommunity[docSnap.data().communityID]
@@ -70,6 +74,38 @@ const ResProfileScreen = ({ navigation }) => {
     }
   }
 
+  const deleteAccount = async () => {
+    // Show an alert to confirm account deletion
+    Alert.alert(
+      'Confirm Account Deletion',
+      'Are you sure you want to delete your account? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            // Delete the user's account in Firebase Authentication
+            try {
+              await auth.currentUser.delete();
+              console.log('User account deleted successfully.');
+              // Navigate to the login screen or any other appropriate screen after deletion
+              navigation.navigate('Login'); // Change 'Login' to the desired screen
+            } catch (error) {
+              console.error('Error deleting user account:', error.message);
+              // Handle the error, display an error message, or provide user feedback
+            }
+          },
+          style: 'destructive', // The button is styled to indicate a destructive action
+        },
+      ],
+      { cancelable: true } // Allow the user to tap outside the alert to dismiss it
+    );
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Resident Profile</Text>
@@ -77,7 +113,7 @@ const ResProfileScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         onChangeText={setName}
-        value={user.name ? user.name : "Name"}
+        value={name}
       />
 
 
@@ -99,7 +135,7 @@ const ResProfileScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         onChangeText={setEmail}
-        value={user.email ? user.email : "Enter email"}
+        value={email}
       />
       <Picker
         selectedValue={selectedCommunity ? selectedCommunity.id : ''}
@@ -113,8 +149,14 @@ const ResProfileScreen = ({ navigation }) => {
           <Picker.Item key={community.id} label={community.name} value={community.id} />
         ))}
       </Picker>
+      <View style={{flexDirection:'row', justifyContent:'space-evenly'}}>
+        <Button onPress={save} mode="elevated"> Save </Button>
+        <Button onPress={deleteAccount} mode="contained">
 
-      <Button onPress={save}> Save </Button>
+          Delete Account
+        </Button>
+      </View>
+
 
     </SafeAreaView>
   )
@@ -154,6 +196,20 @@ const styles = StyleSheet.create({
   buttonText: {
     fontWeight: 'bold',
     fontSize: 25,
+    color: '#fff',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    fontWeight: 'bold',
+    fontSize: 16,
     color: '#fff',
   },
 });

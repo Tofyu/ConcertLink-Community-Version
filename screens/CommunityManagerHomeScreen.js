@@ -64,10 +64,10 @@ const CommunityManagerHomeScreen = ({ animatedValue,
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    // console.log("Group ID", groupID)
-    console.log("Events:::::::",events)
-  }, [events])
+  // useEffect(() => {
+  //   // console.log("Group ID", groupID)
+  //   console.log("Events:::::::",events)
+  // }, [events])
 
   const fetchData = async () => {
     const groupID = await getCommunityGroupID();
@@ -101,24 +101,7 @@ const CommunityManagerHomeScreen = ({ animatedValue,
     </Card>
   )
 
-  // const renderContent = () => {
-  //   //To Restrict access to non-manager
-  //   if (!groupID) {
-  //     return (
-  //       <View style={{ backgroundColor: 'white', padding: 10 }}>
-  //         <Text>You don't have access to this page</Text>
-  //         <Button title="Back to Home" onPress={() => navigation.navigate('Home')} />
-  //       </View>
-  //     );
-  //   }
-  //   return (
-  //     <View>
-
-  //     </View>
-  //   );
-
-  // }
-
+  
   return (
 
     <SafeAreaView style={styles.container}>

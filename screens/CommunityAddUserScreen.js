@@ -13,9 +13,9 @@ const CommunityAddUserScreen = ({route, navigation}) => {
     const [birthday, setBirthday] = useState(new Date(1950, 0, 1));
     const [showPicker, setShowPicker] = useState(false);
     
-    useEffect(() => {
-      console.log("*********" , user)
-    },[])
+    // useEffect(() => {
+    //   console.log("*********" , user)
+    // },[])
 
   const AddUser = async ()=>{
     try {
